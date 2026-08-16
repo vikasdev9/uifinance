@@ -9,13 +9,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Layers
+import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -43,9 +49,14 @@ import com.uifinance.project291.design_system.HighEmphasisText
 import com.uifinance.project291.design_system.SecondaryText
 import com.uifinance.project291.navigation.AnalyticsDestination
 import com.uifinance.project291.navigation.AssetsDestination
+import com.uifinance.project291.navigation.BudgetsDestination
 import com.uifinance.project291.navigation.SettingsDestination
 import com.uifinance.project291.navigation.VaultDestination
+import com.uifinance.project291.navigation.AddEntryDestination
+import com.uifinance.project291.navigation.EditBudgetDestination
 import com.uifinance.project291.ui.analytics.AnalyticsScreen
+import com.uifinance.project291.ui.budget.AddEntryScreen
+import com.uifinance.project291.ui.budget.BudgetListScreen
 import com.uifinance.project291.ui.dashboard.DashboardScreen
 
 private data class BottomNavItem(
@@ -57,7 +68,7 @@ private data class BottomNavItem(
 private val bottomNavItems = listOf(
     BottomNavItem(VaultDestination, "Vault", Icons.Outlined.AccountBalanceWallet),
     BottomNavItem(AnalyticsDestination, "Analytics", Icons.Outlined.BarChart),
-    BottomNavItem(AssetsDestination, "Assets", Icons.Outlined.Layers),
+    BottomNavItem(BudgetsDestination, "Budgets", Icons.Outlined.PieChart),
     BottomNavItem(SettingsDestination, "Settings", Icons.Outlined.Settings),
 )
 
@@ -86,6 +97,20 @@ fun NovaVestApp() {
                 },
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(AddEntryDestination) },
+                containerColor = EmeraldGreen,
+                contentColor = DeepObsidian,
+                shape = CircleShape,
+                modifier = Modifier
+                    .size(56.dp)
+                    .offset(y = 40.dp) // Move it down to overlap with bottom bar
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add", modifier = Modifier.size(28.dp))
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center,
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -101,11 +126,20 @@ fun NovaVestApp() {
             composable<AnalyticsDestination> {
                 AnalyticsScreen()
             }
-            composable<AssetsDestination> {
-                PlaceholderScreen(title = "Assets")
+            composable<BudgetsDestination> {
+                BudgetListScreen(
+                    onAddBudget = { navController.navigate(AddEntryDestination) },
+                    onEditBudget = { id -> /* navigate to edit */ }
+                )
             }
             composable<SettingsDestination> {
                 PlaceholderScreen(title = "Settings")
+            }
+            composable<AddEntryDestination> {
+                AddEntryScreen(
+                    onBack = { navController.popBackStack() },
+                    onSuccess = { navController.popBackStack() }
+                )
             }
         }
     }
