@@ -1,6 +1,7 @@
 package com.uifinance.project291.data.repository
 
 import com.uifinance.project291.data.local.dao.CategoryDao
+import com.uifinance.project291.data.local.dao.TransactionDao
 import com.uifinance.project291.data.local.entity.Category
 import com.uifinance.project291.data.local.entity.CategoryType
 import com.uifinance.project291.data.local.entity.CategoryWithChildren
@@ -20,7 +21,8 @@ interface CategoryRepository {
 
 @Singleton
 class CategoryRepositoryImpl @Inject constructor(
-    private val categoryDao: CategoryDao
+    private val categoryDao: CategoryDao,
+    private val transactionDao: TransactionDao
 ) : CategoryRepository {
     override fun getCategoriesByType(type: CategoryType): Flow<List<Category>> =
         categoryDao.getCategoriesByType(type)
@@ -30,7 +32,10 @@ class CategoryRepositoryImpl @Inject constructor(
 
     override suspend fun insert(category: Category): Long = categoryDao.insert(category)
 
-    override suspend fun update(category: Category) = categoryDao.update(category)
+    override suspend fun update(category: Category) {
+        categoryDao.update(category)
+        transactionDao.updateTransactionTitlesByCategory(category.id.toString(), category.name)
+    }
 
     override suspend fun delete(category: Category) = categoryDao.delete(category)
 

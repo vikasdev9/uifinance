@@ -15,6 +15,12 @@ object AnalyticsDestination
 object SettingsDestination
 
 @Serializable
+object ManageCategoriesDestination
+
+@Serializable
+object ManagePaymentMethodsDestination
+
+@Serializable
 object BudgetsDestination
 
 @Serializable

@@ -9,6 +9,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY date DESC")
     fun getAllTransactions(): Flow<List<TransactionEntity>>
 
+    @Query("UPDATE transactions SET title = :newTitle WHERE categoryId = :categoryId")
+    suspend fun updateTransactionTitlesByCategory(categoryId: String, newTitle: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionEntity)
 

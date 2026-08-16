@@ -9,8 +9,14 @@ interface PaymentMethodDao {
     @Query("SELECT * FROM payment_methods")
     fun getAllPaymentMethods(): Flow<List<PaymentMethod>>
 
+    @Query("SELECT * FROM payment_methods WHERE isActive = 1")
+    fun getActivePaymentMethods(): Flow<List<PaymentMethod>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPaymentMethod(paymentMethod: PaymentMethod): Long
+
+    @Update
+    suspend fun updatePaymentMethod(paymentMethod: PaymentMethod)
 
     @Delete
     suspend fun deletePaymentMethod(paymentMethod: PaymentMethod)

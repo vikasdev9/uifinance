@@ -51,6 +51,8 @@ import java.util.*
 @Composable
 fun AddBudgetScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToCategoryManagement: () -> Unit,
+    onNavigateToPaymentMethodManagement: () -> Unit,
     viewModel: AddBudgetViewModel = hiltViewModel(),
     categoryViewModel: CategoryPickerViewModel = hiltViewModel()
 ) {
@@ -302,7 +304,10 @@ fun AddBudgetScreen(
                     CategoryPickerContent(
                         viewModel = categoryViewModel,
                         onDismiss = { activeCategorySheet = null },
-                        onNavigateToManagement = {},
+                        onNavigateToManagement = {
+                            activeCategorySheet = null
+                            onNavigateToCategoryManagement()
+                        },
                         onAddNewCategory = { parentId ->
                             activeCategorySheet = CategorySheetState.AddNew(parentId)
                         }
@@ -348,6 +353,10 @@ fun AddBudgetScreen(
                 },
                 onAddCustom = { name, icon, color, type ->
                     viewModel.addCustomPaymentMethod(name, icon, color, type)
+                },
+                onNavigateToManagement = {
+                    showPaymentMethodPicker = false
+                    onNavigateToPaymentMethodManagement()
                 },
                 onDismiss = { showPaymentMethodPicker = false }
             )

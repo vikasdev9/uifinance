@@ -51,8 +51,14 @@ import com.uifinance.project291.navigation.*
 import com.uifinance.project291.ui.analytics.AnalyticsScreen
 import com.uifinance.project291.ui.budget.AddEntryScreen
 import com.uifinance.project291.ui.budget.BudgetListScreen
+import com.uifinance.project291.ui.category.CategoryManagementScreen
+import com.uifinance.project291.ui.category.CategoryManagementViewModel
 import com.uifinance.project291.ui.dashboard.DashboardScreen
 import com.uifinance.project291.ui.onboarding.OnboardingScreen
+import com.uifinance.project291.ui.payment.PaymentMethodManagementScreen
+import com.uifinance.project291.ui.payment.PaymentMethodManagementViewModel
+import com.uifinance.project291.ui.settings.SettingsScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 
 private data class BottomNavItem(
     val destination: Any,
@@ -74,7 +80,9 @@ fun NovaVestApp() {
     val currentDestination = navBackStackEntry?.destination
 
     val showBottomBar = currentDestination?.hasRoute(OnboardingDestination::class) == false &&
-            currentDestination.hasRoute(AddEntryDestination::class) == false
+            currentDestination.hasRoute(AddEntryDestination::class) == false &&
+            currentDestination.hasRoute(ManageCategoriesDestination::class) == false &&
+            currentDestination.hasRoute(ManagePaymentMethodsDestination::class) == false
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -144,12 +152,31 @@ fun NovaVestApp() {
                 )
             }
             composable<SettingsDestination> {
-                PlaceholderScreen(title = "Settings")
+                SettingsScreen(
+                    onNavigateToCategories = { navController.navigate(ManageCategoriesDestination) },
+                    onNavigateToPaymentMethods = { navController.navigate(ManagePaymentMethodsDestination) },
+                    onNavigateToAccounts = {},
+                    onNavigateToProfile = {}
+                )
+            }
+            composable<ManageCategoriesDestination> {
+                CategoryManagementScreen(
+                    viewModel = hiltViewModel(),
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+            composable<ManagePaymentMethodsDestination> {
+                PaymentMethodManagementScreen(
+                    viewModel = hiltViewModel(),
+                    onBackClick = { navController.popBackStack() }
+                )
             }
             composable<AddEntryDestination> {
                 AddEntryScreen(
                     onBack = { navController.popBackStack() },
-                    onSuccess = { navController.popBackStack() }
+                    onSuccess = { navController.popBackStack() },
+                    onNavigateToCategoryManagement = { navController.navigate(ManageCategoriesDestination) },
+                    onNavigateToPaymentMethodManagement = { navController.navigate(ManagePaymentMethodsDestination) }
                 )
             }
         }

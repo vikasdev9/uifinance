@@ -32,6 +32,7 @@ fun PaymentMethodPickerContent(
     selectedMethod: PaymentMethod?,
     onMethodSelected: (PaymentMethod) -> Unit,
     onAddCustom: (name: String, icon: String, color: String, type: PaymentMethodType) -> Unit,
+    onNavigateToManagement: () -> Unit,
     onDismiss: () -> Unit
 ) {
     var currentState by remember { mutableStateOf<PaymentMethodSheetState>(PaymentMethodSheetState.Picker) }
@@ -46,6 +47,7 @@ fun PaymentMethodPickerContent(
                 onTypeSelected = { selectedType = it },
                 onMethodSelected = onMethodSelected,
                 onAddNewClick = { currentState = PaymentMethodSheetState.AddNew },
+                onNavigateToManagement = onNavigateToManagement,
                 onDismiss = onDismiss
             )
         }
@@ -70,6 +72,7 @@ private fun PaymentMethodPickerList(
     onTypeSelected: (PaymentMethodType) -> Unit,
     onMethodSelected: (PaymentMethod) -> Unit,
     onAddNewClick: () -> Unit,
+    onNavigateToManagement: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val filteredMethods = paymentMethods.filter { it.type == selectedType }
@@ -79,7 +82,7 @@ private fun PaymentMethodPickerList(
         title = "Account",
         onDismiss = onDismiss,
         headerAction = {
-            IconButton(onClick = { /* Settings action */ }) {
+            IconButton(onClick = onNavigateToManagement) {
                 Icon(Icons.Rounded.Settings, contentDescription = "Settings", tint = HighEmphasisText)
             }
         }

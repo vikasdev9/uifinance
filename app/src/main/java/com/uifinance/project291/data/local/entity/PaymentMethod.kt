@@ -16,5 +16,6 @@ data class PaymentMethod(
     val colorHex: String, // Hex color code
     val type: PaymentMethodType = PaymentMethodType.ASSET,
     val isDefault: Boolean = false,
-    val allowNegativeBalance: Boolean = false
+    val allowNegativeBalance: Boolean = false,
+    val isActive: Boolean = true
 )

@@ -60,7 +60,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideCategoryRepository(categoryDao: CategoryDao): CategoryRepository {
-        return CategoryRepositoryImpl(categoryDao)
+    fun provideCategoryRepository(categoryDao: CategoryDao, transactionDao: TransactionDao): CategoryRepository {
+        return CategoryRepositoryImpl(categoryDao, transactionDao)
     }
 }

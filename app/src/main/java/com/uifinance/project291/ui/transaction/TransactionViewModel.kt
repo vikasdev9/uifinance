@@ -38,7 +38,7 @@ class TransactionViewModel @Inject constructor(
     private val _attachmentUri = MutableStateFlow<Uri?>(null)
     val attachmentUri: StateFlow<Uri?> = _attachmentUri
 
-    val paymentMethods: StateFlow<List<PaymentMethod>> = paymentMethodRepository.getAllPaymentMethods()
+    val paymentMethods: StateFlow<List<PaymentMethod>> = paymentMethodRepository.getActivePaymentMethods()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {

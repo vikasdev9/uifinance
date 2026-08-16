@@ -12,7 +12,7 @@ import com.uifinance.project291.data.local.entity.Category
 import com.uifinance.project291.data.local.entity.PaymentMethod
 import com.uifinance.project291.data.local.entity.TransactionEntity
 
-@Database(entities = [Budget::class, TransactionEntity::class, Category::class, PaymentMethod::class], version = 4, exportSchema = false)
+@Database(entities = [Budget::class, TransactionEntity::class, Category::class, PaymentMethod::class], version = 5, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao

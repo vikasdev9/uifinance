@@ -1,5 +1,6 @@
 package com.uifinance.project291.ui.category
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,7 +23,7 @@ import com.uifinance.project291.data.local.entity.Category
 import com.uifinance.project291.data.local.entity.CategoryType
 import com.uifinance.project291.data.local.entity.CategoryWithChildren
 import com.uifinance.project291.design_system.*
-import com.uifinance.project291.ui.category.components.AddEditCategoryDialog
+import com.uifinance.project291.ui.category.components.AddEditCategoryBottomSheet
 import com.uifinance.project291.ui.category.components.CategoryIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,24 +34,105 @@ fun CategoryManagementScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val categoryType by viewModel.categoryType.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
-    var showAddDialog by remember { mutableStateOf(false) }
+    var showAddSheet by remember { mutableStateOf(false) }
     var selectedParentIdForAdd by remember { mutableStateOf<Long?>(null) }
     var categoryToEdit by remember { mutableStateOf<Category?>(null) }
+    var categoryToDelete by remember { mutableStateOf<Category?>(null) }
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    if (categoryToDelete != null) {
+        val hasChildren = (uiState as? CategoryManagementUiState.Success)?.categories?.find { it.category.id == categoryToDelete?.id }?.children?.isNotEmpty() == true
+        
+        AlertDialog(
+            onDismissRequest = { categoryToDelete = null },
+            title = { Text("Delete Category?") },
+            text = { 
+                Column {
+                    Text("Are you sure you want to delete '${categoryToDelete?.name}'?")
+                    if (hasChildren) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("This category contains subcategories. What would you like to do?", style = MaterialTheme.typography.bodySmall, color = SecondaryText)
+                    }
+                }
+            },
+            confirmButton = {
+                if (hasChildren) {
+                    Column(horizontalAlignment = Alignment.End) {
+                        TextButton(onClick = {
+                            viewModel.deleteCategory(categoryToDelete!!, moveChildrenToOther = true)
+                            categoryToDelete = null
+                        }) {
+                            Text("DELETE PARENT ONLY (Move children to Other)", color = EmeraldGreen)
+                        }
+                        TextButton(onClick = {
+                            viewModel.deleteCategory(categoryToDelete!!, moveChildrenToOther = false)
+                            categoryToDelete = null
+                        }) {
+                            Text("DELETE EVERYTHING", color = NegativeRed)
+                        }
+                    }
+                } else {
+                    TextButton(onClick = {
+                        viewModel.deleteCategory(categoryToDelete!!, moveChildrenToOther = false)
+                        categoryToDelete = null
+                    }) {
+                        Text("DELETE", color = NegativeRed)
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { categoryToDelete = null }) {
+                    Text("CANCEL", color = SecondaryText)
+                }
+            },
+            containerColor = CardSurface,
+            titleContentColor = HighEmphasisText,
+            textContentColor = SecondaryText
+        )
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Manage Categories", fontWeight = FontWeight.Bold) },
+                title = {
+                    if (isSearchActive) {
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { viewModel.setSearchQuery(it) },
+                            placeholder = { Text("Search categories...", color = SecondaryText) },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedTextColor = HighEmphasisText,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            singleLine = true
+                        )
+                    } else {
+                        Text("Manage Categories", fontWeight = FontWeight.Bold)
+                    }
+                },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Rounded.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = if (isSearchActive) { { isSearchActive = false; viewModel.setSearchQuery("") } } else onBackClick) {
+                        Icon(if (isSearchActive) Icons.Rounded.Close else Icons.Rounded.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    if (!isSearchActive) {
+                        IconButton(onClick = { isSearchActive = true }) {
+                            Icon(Icons.Rounded.Search, contentDescription = "Search")
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = DeepObsidian,
                     titleContentColor = HighEmphasisText,
-                    navigationIconContentColor = HighEmphasisText
+                    navigationIconContentColor = HighEmphasisText,
+                    actionIconContentColor = HighEmphasisText
                 )
             )
         },
@@ -60,7 +142,7 @@ fun CategoryManagementScreen(
                 onClick = {
                     selectedParentIdForAdd = null
                     categoryToEdit = null
-                    showAddDialog = true
+                    showAddSheet = true
                 },
                 containerColor = EmeraldGreen,
                 contentColor = DeepObsidian,
@@ -84,39 +166,64 @@ fun CategoryManagementScreen(
                     }
                 }
                 is CategoryManagementUiState.Success -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        state.categories.forEach { categoryWithChildren ->
+                    if (state.categories.isEmpty()) {
+                        EmptyState()
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             item {
-                                ParentCategoryRow(
-                                    category = categoryWithChildren.category,
-                                    onEdit = {
-                                        categoryToEdit = it
-                                        showAddDialog = true
-                                    },
-                                    onDelete = { viewModel.deleteCategory(it) },
-                                    onAddSub = {
-                                        selectedParentIdForAdd = categoryWithChildren.category.id
-                                        categoryToEdit = null
-                                        showAddDialog = true
-                                    }
+                                CategorySummary(
+                                    total = state.totalCount,
+                                    parents = state.parentCount
                                 )
                             }
-                            items(categoryWithChildren.children) { child ->
-                                ChildCategoryRow(
+                            
+                            state.categories.forEach { categoryWithChildren ->
+                                item(key = "parent_${categoryWithChildren.category.id}") {
+                                    ParentCategoryRow(
+                                        category = categoryWithChildren.category,
+                                        onEdit = {
+                                            categoryToEdit = it
+                                            showAddSheet = true
+                                        },
+                                        onDelete = { categoryToDelete = it },
+                                        onAddSub = {
+                                            selectedParentIdForAdd = categoryWithChildren.category.id
+                                            categoryToEdit = null
+                                            showAddSheet = true
+                                        }
+                                    )
+                                }
+                                items(categoryWithChildren.children, key = { "child_${it.id}" }) { child ->
+                                    ChildCategoryRow(
                                     category = child,
                                     onEdit = {
                                         categoryToEdit = it
-                                        showAddDialog = true
+                                        showAddSheet = true
                                     },
-                                    onDelete = { viewModel.deleteCategory(it) }
+                                    onDelete = { categoryToDelete = it }
                                 )
+                                }
+                                item {
+                                    TextButton(
+                                        onClick = {
+                                            selectedParentIdForAdd = categoryWithChildren.category.id
+                                            categoryToEdit = null
+                                            showAddSheet = true
+                                        },
+                                        modifier = Modifier.padding(start = 32.dp)
+                                    ) {
+                                        Icon(Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(16.dp), tint = EmeraldGreen)
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Add subcategory", color = EmeraldGreen, style = MaterialTheme.typography.labelLarge)
+                                    }
+                                }
                             }
+                            item { Spacer(modifier = Modifier.height(80.dp)) }
                         }
-                        item { Spacer(modifier = Modifier.height(80.dp)) }
                     }
                 }
                 is CategoryManagementUiState.Error -> {
@@ -128,19 +235,75 @@ fun CategoryManagementScreen(
         }
     }
 
-    if (showAddDialog) {
-        AddEditCategoryDialog(
-            category = categoryToEdit,
-            parentId = selectedParentIdForAdd,
-            onDismiss = { showAddDialog = false },
-            onConfirm = { name, icon, color ->
-                if (categoryToEdit == null) {
-                    viewModel.addCategory(name, icon, color, selectedParentIdForAdd)
-                } else {
-                    viewModel.updateCategory(categoryToEdit!!.copy(name = name, iconRes = icon, colorHex = color))
+    if (showAddSheet) {
+        val parentCategories = (uiState as? CategoryManagementUiState.Success)?.categories?.map { it.category } ?: emptyList()
+        ModalBottomSheet(
+            onDismissRequest = { showAddSheet = false },
+            containerColor = DeepObsidian,
+            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+        ) {
+            AddEditCategoryBottomSheet(
+                category = categoryToEdit,
+                parentId = selectedParentIdForAdd,
+                parentCategories = parentCategories,
+                onDismiss = { showAddSheet = false },
+                onConfirm = { name, icon, color, parentId ->
+                    if (categoryToEdit == null) {
+                        viewModel.addCategory(name, icon, color, parentId)
+                    } else {
+                        viewModel.updateCategory(categoryToEdit!!.copy(name = name, iconRes = icon, colorHex = color, parentId = parentId))
+                    }
+                    showAddSheet = false
                 }
-                showAddDialog = false
-            }
+            )
+        }
+    }
+}
+
+@Composable
+fun CategorySummary(total: Int, parents: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(CardSurface.copy(alpha = 0.5f))
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        SummaryItem(label = "Total", value = total.toString())
+        SummaryItem(label = "Parents", value = parents.toString())
+    }
+}
+
+@Composable
+fun SummaryItem(label: String, value: String) {
+    Column {
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = SecondaryText)
+        Text(text = value, style = MaterialTheme.typography.titleMedium, color = HighEmphasisText, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun EmptyState() {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            Icons.Rounded.Category,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = SecondaryText.copy(alpha = 0.2f)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("No categories yet", color = HighEmphasisText, style = MaterialTheme.typography.titleMedium)
+        Text(
+            "Create categories to organize your expenses and income.",
+            color = SecondaryText,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp)
         )
     }
 }

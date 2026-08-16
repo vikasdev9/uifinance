@@ -37,6 +37,8 @@ import androidx.compose.animation.*
 fun AddEntryScreen(
     onBack: () -> Unit,
     onSuccess: () -> Unit,
+    onNavigateToCategoryManagement: () -> Unit,
+    onNavigateToPaymentMethodManagement: () -> Unit,
     transactionViewModel: TransactionViewModel = hiltViewModel(),
     transferViewModel: AddTransferViewModel = hiltViewModel(),
     categoryViewModel: CategoryPickerViewModel = hiltViewModel()
@@ -261,7 +263,10 @@ fun AddEntryScreen(
                     CategoryPickerContent(
                         viewModel = categoryViewModel,
                         onDismiss = { activeCategorySheet = null },
-                        onNavigateToManagement = {},
+                        onNavigateToManagement = {
+                            activeCategorySheet = null
+                            onNavigateToCategoryManagement()
+                        },
                         onAddNewCategory = { parentId ->
                             activeCategorySheet = CategorySheetState.AddNew(parentId)
                         }
@@ -325,6 +330,10 @@ fun AddEntryScreen(
                         2 -> { /* Transfer VM doesn't have add custom PM yet, can reuse transaction VM or add to it */ }
                         else -> transactionViewModel.addCustomPaymentMethod(name, icon, color, type)
                     }
+                },
+                onNavigateToManagement = {
+                    showPaymentMethodPicker = false
+                    onNavigateToPaymentMethodManagement()
                 },
                 onDismiss = { showPaymentMethodPicker = false }
             )

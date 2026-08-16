@@ -14,7 +14,11 @@ import javax.inject.Inject
 
 sealed class CategoryManagementUiState {
     object Loading : CategoryManagementUiState()
-    data class Success(val categories: List<CategoryWithChildren>) : CategoryManagementUiState()
+    data class Success(
+        val categories: List<CategoryWithChildren>,
+        val totalCount: Int = 0,
+        val parentCount: Int = 0
+    ) : CategoryManagementUiState()
     data class Error(val message: String) : CategoryManagementUiState()
 }
 
@@ -27,18 +31,50 @@ class CategoryManagementViewModel @Inject constructor(
     private val _categoryType = MutableStateFlow(CategoryType.EXPENSE)
     val categoryType: StateFlow<CategoryType> = _categoryType.asStateFlow()
 
-    val uiState: StateFlow<CategoryManagementUiState> = _categoryType
-        .flatMapLatest { type ->
-            repository.getCategoriesWithChildren(type)
-                .map { categories -> CategoryManagementUiState.Success(categories) as CategoryManagementUiState }
-                .onStart { emit(CategoryManagementUiState.Loading) }
-                .catch { e -> emit(CategoryManagementUiState.Error(e.message ?: "Unknown error")) }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = CategoryManagementUiState.Loading
-        )
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    val uiState: StateFlow<CategoryManagementUiState> = combine(
+        _categoryType,
+        _searchQuery
+    ) { type, query ->
+        type to query
+    }.flatMapLatest { (type, query) ->
+        repository.getCategoriesWithChildren(type)
+            .map { categories ->
+                val successCategories = if (query.isBlank()) {
+                    categories
+                } else {
+                    categories.filter { categoryWithChildren ->
+                        categoryWithChildren.category.name.contains(query, ignoreCase = true) ||
+                                categoryWithChildren.children.any { it.name.contains(query, ignoreCase = true) }
+                    }.map { categoryWithChildren ->
+                        if (categoryWithChildren.category.name.contains(query, ignoreCase = true)) {
+                            categoryWithChildren
+                        } else {
+                            categoryWithChildren.copy(
+                                children = categoryWithChildren.children.filter { it.name.contains(query, ignoreCase = true) }
+                            )
+                        }
+                    }
+                }
+                CategoryManagementUiState.Success(
+                    categories = successCategories,
+                    totalCount = categories.sumOf { 1 + it.children.size },
+                    parentCount = categories.size
+                ) as CategoryManagementUiState
+            }
+            .onStart { emit(CategoryManagementUiState.Loading) }
+            .catch { e -> emit(CategoryManagementUiState.Error(e.message ?: "Unknown error")) }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = CategoryManagementUiState.Loading
+    )
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
 
     fun setCategoryType(type: CategoryType) {
         _categoryType.value = type
@@ -46,6 +82,10 @@ class CategoryManagementViewModel @Inject constructor(
 
     fun addCategory(name: String, iconRes: String, colorHex: String, parentId: Long? = null) {
         viewModelScope.launch {
+            if (isDuplicateName(name, parentId)) {
+                // Handle duplicate error (maybe through a separate UI event)
+                return@launch
+            }
             val category = Category(
                 name = name,
                 iconRes = iconRes,
@@ -55,6 +95,20 @@ class CategoryManagementViewModel @Inject constructor(
             )
             repository.insert(category)
         }
+    }
+
+    private suspend fun isDuplicateName(name: String, parentId: Long?): Boolean {
+        // Simple check against current state for performance
+        val state = uiState.value
+        if (state is CategoryManagementUiState.Success) {
+            return if (parentId == null) {
+                state.categories.any { it.category.name.equals(name, ignoreCase = true) }
+            } else {
+                val parent = state.categories.find { it.category.id == parentId }
+                parent?.children?.any { it.name.equals(name, ignoreCase = true) } ?: false
+            }
+        }
+        return false
     }
 
     fun updateCategory(category: Category) {

@@ -20,9 +20,17 @@ class PaymentMethodRepository @Inject constructor(
 
     fun getAllPaymentMethods(): Flow<List<PaymentMethod>> = paymentMethodDao.getAllPaymentMethods()
 
+    fun getActivePaymentMethods(): Flow<List<PaymentMethod>> = paymentMethodDao.getActivePaymentMethods()
+
     suspend fun insertPaymentMethod(paymentMethod: PaymentMethod) = paymentMethodDao.insertPaymentMethod(paymentMethod)
 
+    suspend fun updatePaymentMethod(paymentMethod: PaymentMethod) = paymentMethodDao.updatePaymentMethod(paymentMethod)
+
     suspend fun deletePaymentMethod(paymentMethod: PaymentMethod) = paymentMethodDao.deletePaymentMethod(paymentMethod)
+
+    suspend fun softDeletePaymentMethod(paymentMethod: PaymentMethod) {
+        paymentMethodDao.updatePaymentMethod(paymentMethod.copy(isActive = false))
+    }
 
     suspend fun seedDefaultPaymentMethods() {
         seedingMutex.withLock {
