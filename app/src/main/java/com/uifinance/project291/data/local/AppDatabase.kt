@@ -4,13 +4,19 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.uifinance.project291.data.local.dao.BudgetDao
+import com.uifinance.project291.data.local.dao.CategoryDao
 import com.uifinance.project291.data.local.dao.TransactionDao
+import com.uifinance.project291.data.local.dao.PaymentMethodDao
 import com.uifinance.project291.data.local.entity.Budget
+import com.uifinance.project291.data.local.entity.Category
+import com.uifinance.project291.data.local.entity.PaymentMethod
 import com.uifinance.project291.data.local.entity.TransactionEntity
 
-@Database(entities = [Budget::class, TransactionEntity::class], version = 1, exportSchema = false)
+@Database(entities = [Budget::class, TransactionEntity::class, Category::class, PaymentMethod::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
     abstract fun transactionDao(): TransactionDao
+    abstract fun categoryDao(): CategoryDao
+    abstract fun paymentMethodDao(): PaymentMethodDao
 }

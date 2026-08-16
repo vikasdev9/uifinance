@@ -12,6 +12,11 @@ interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionEntity)
 
-    @Delete
-    suspend fun deleteTransaction(transaction: TransactionEntity)
+    @Query("""
+        SELECT 
+            (SELECT TOTAL(amount) FROM transactions WHERE paymentMethodId = :paymentMethodId AND type != 'TRANSFER') +
+            (SELECT TOTAL(amount) FROM transactions WHERE toPaymentMethodId = :paymentMethodId AND type = 'TRANSFER') -
+            (SELECT TOTAL(amount) FROM transactions WHERE paymentMethodId = :paymentMethodId AND type = 'TRANSFER')
+    """)
+    fun getPaymentMethodBalance(paymentMethodId: Long): Flow<Double>
 }

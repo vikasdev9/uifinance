@@ -12,9 +12,6 @@ object VaultDestination
 object AnalyticsDestination
 
 @Serializable
-object AssetsDestination
-
-@Serializable
 object SettingsDestination
 
 @Serializable
@@ -22,6 +19,3 @@ object BudgetsDestination
 
 @Serializable
 object AddEntryDestination
-
-@Serializable
-data class EditBudgetDestination(val id: Long)

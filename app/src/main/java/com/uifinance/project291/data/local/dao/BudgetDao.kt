@@ -12,14 +12,8 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets WHERE isActive = 1")
     fun getActiveBudgets(): Flow<List<Budget>>
 
-    @Query("SELECT * FROM budgets WHERE id = :id")
-    suspend fun getBudgetById(id: Long): Budget?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBudget(budget: Budget)
-
-    @Update
-    suspend fun updateBudget(budget: Budget)
 
     @Delete
     suspend fun deleteBudget(budget: Budget)

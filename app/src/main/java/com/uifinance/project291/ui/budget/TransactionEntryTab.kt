@@ -10,8 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Notes
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -26,35 +24,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.uifinance.project291.data.local.entity.BudgetPeriod
-import com.uifinance.project291.data.local.entity.PaymentMethod
 import com.uifinance.project291.data.local.entity.RecurrenceType
 import com.uifinance.project291.design_system.*
 import com.uifinance.project291.ui.category.components.CategoryIcons
+import com.uifinance.project291.ui.transaction.TransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun BudgetEntryTab(
-    viewModel: AddEditBudgetViewModel,
+fun TransactionEntryTab(
+    viewModel: TransactionViewModel,
     onCategoryClick: () -> Unit,
     onDateClick: () -> Unit,
     onAmountClick: () -> Unit,
     onPaymentMethodClick: () -> Unit,
     onRecurrenceClick: () -> Unit,
-    onAttachmentClick: () -> Unit,
-    paymentMethods: List<PaymentMethod>,
-    selectedPaymentMethodId: Long,
-    note: String,
-    attachmentUri: Uri?
+    onAttachmentClick: () -> Unit
 ) {
     val amount by viewModel.amount.collectAsStateWithLifecycle()
-    val name by viewModel.name.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
-    val period by viewModel.period.collectAsStateWithLifecycle()
-    val startDate by viewModel.startDate.collectAsStateWithLifecycle()
+    val selectedPaymentMethod by viewModel.selectedPaymentMethod.collectAsStateWithLifecycle()
+    val date by viewModel.date.collectAsStateWithLifecycle()
     val recurrence by viewModel.recurrence.collectAsStateWithLifecycle()
-    val alertThreshold by viewModel.alertThreshold.collectAsStateWithLifecycle()
+    val note by viewModel.note.collectAsStateWithLifecycle()
+    val attachmentUri by viewModel.attachmentUri.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -64,29 +57,20 @@ fun BudgetEntryTab(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
         
-        // Amount Display
         Box(modifier = Modifier.clickable(onClick = onAmountClick)) {
-            AmountDisplay(amount = amount)
+            TransactionAmountDisplay(amount = amount)
         }
         
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Form Fields
-        BudgetFormFields(
-            name = name,
-            onNameChange = viewModel::onNameChange,
+        TransactionFormFields(
             selectedCategory = selectedCategory,
             onCategoryClick = onCategoryClick,
-            period = period,
-            onPeriodChange = viewModel::onPeriodChange,
-            startDate = startDate,
+            selectedPaymentMethodName = selectedPaymentMethod?.name ?: "Select Method",
+            onPaymentMethodClick = onPaymentMethodClick,
+            date = date,
             onDateClick = onDateClick,
             recurrence = recurrence,
-            onRecurrenceChange = viewModel::onRecurrenceChange,
-            alertThreshold = alertThreshold,
-            onThresholdChange = viewModel::onAlertThresholdChange,
-            selectedPaymentMethodName = paymentMethods.find { it.id == selectedPaymentMethodId }?.name ?: "Select Method",
-            onPaymentMethodClick = onPaymentMethodClick,
             onRecurrenceClick = onRecurrenceClick,
             note = note,
             onNoteChange = viewModel::onNoteChange,
@@ -100,7 +84,7 @@ fun BudgetEntryTab(
 }
 
 @Composable
-private fun AmountDisplay(amount: String) {
+private fun TransactionAmountDisplay(amount: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -130,21 +114,14 @@ private fun AmountDisplay(amount: String) {
 }
 
 @Composable
-private fun BudgetFormFields(
-    name: String,
-    onNameChange: (String) -> Unit,
+private fun TransactionFormFields(
     selectedCategory: com.uifinance.project291.data.local.entity.Category?,
     onCategoryClick: () -> Unit,
-    period: BudgetPeriod,
-    onPeriodChange: (BudgetPeriod) -> Unit,
-    startDate: Date,
-    onDateClick: () -> Unit,
-    recurrence: RecurrenceType,
-    onRecurrenceChange: (RecurrenceType) -> Unit,
-    alertThreshold: Int,
-    onThresholdChange: (Int) -> Unit,
     selectedPaymentMethodName: String,
     onPaymentMethodClick: () -> Unit,
+    date: Date,
+    onDateClick: () -> Unit,
+    recurrence: RecurrenceType,
     onRecurrenceClick: () -> Unit,
     note: String,
     onNoteChange: (String) -> Unit,
@@ -153,20 +130,6 @@ private fun BudgetFormFields(
     onRemoveAttachment: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        // Name
-        OutlinedTextField(
-            value = name,
-            onValueChange = onNameChange,
-            label = { Text("Budget Name") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedTextColor = HighEmphasisText,
-                focusedTextColor = HighEmphasisText,
-                unfocusedBorderColor = DividerColor,
-                focusedBorderColor = EmeraldGreen
-            )
-        )
-
         // Category Selector
         SelectorRow(
             label = "Category",
@@ -183,7 +146,11 @@ private fun BudgetFormFields(
             onClick = onPaymentMethodClick
         )
 
-        // Period
+        // Date
+        val dateStr = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date)
+        SelectorRow(label = "Date", value = dateStr, icon = Icons.Rounded.CalendarToday, onClick = onDateClick)
+
+        // Recurrence (Period)
         SelectorRow(
             label = "Period",
             value = when(recurrence) {
@@ -197,44 +164,19 @@ private fun BudgetFormFields(
             onClick = onRecurrenceClick
         )
 
-        // Start Date
-        val dateStr = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(startDate)
-        SelectorRow(label = "Start Date", value = dateStr, icon = Icons.Rounded.CalendarToday, onClick = onDateClick)
-
         // Note Section
-        BudgetEntryNoteSection(
+        NoteSection(
             note = note,
             attachmentUri = attachmentUri,
             onNoteChange = onNoteChange,
             onAttachmentClick = onAttachmentClick,
             onRemoveAttachment = onRemoveAttachment
         )
-
-        // Alert Threshold
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "Alert me at", style = MaterialTheme.typography.bodyMedium, color = SecondaryText)
-                Text(text = "$alertThreshold%", style = MaterialTheme.typography.bodyMedium, color = EmeraldGreen)
-            }
-            Slider(
-                value = alertThreshold.toFloat(),
-                onValueChange = { onThresholdChange(it.toInt()) },
-                valueRange = 50f..100f,
-                colors = SliderDefaults.colors(
-                    thumbColor = EmeraldGreen,
-                    activeTrackColor = EmeraldGreen,
-                    inactiveTrackColor = DividerColor
-                )
-            )
-        }
     }
 }
 
 @Composable
-private fun BudgetEntryNoteSection(
+internal fun NoteSection(
     note: String,
     attachmentUri: Uri?,
     onNoteChange: (String) -> Unit,
@@ -299,33 +241,5 @@ private fun BudgetEntryNoteSection(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun SelectorRow(
-    label: String,
-    value: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
-    onClick: () -> Unit = {}
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(CardSurface)
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (icon != null) {
-                Icon(imageVector = icon, contentDescription = null, tint = EmeraldGreen, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(12.dp))
-            }
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = SecondaryText)
-        }
-        Text(text = value, style = MaterialTheme.typography.bodyMedium, color = HighEmphasisText, fontWeight = FontWeight.SemiBold)
     }
 }
