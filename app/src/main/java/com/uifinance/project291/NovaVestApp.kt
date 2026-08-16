@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -16,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.filled.Add
@@ -47,17 +47,12 @@ import com.uifinance.project291.design_system.DeepObsidian
 import com.uifinance.project291.design_system.EmeraldGreen
 import com.uifinance.project291.design_system.HighEmphasisText
 import com.uifinance.project291.design_system.SecondaryText
-import com.uifinance.project291.navigation.AnalyticsDestination
-import com.uifinance.project291.navigation.AssetsDestination
-import com.uifinance.project291.navigation.BudgetsDestination
-import com.uifinance.project291.navigation.SettingsDestination
-import com.uifinance.project291.navigation.VaultDestination
-import com.uifinance.project291.navigation.AddEntryDestination
-import com.uifinance.project291.navigation.EditBudgetDestination
+import com.uifinance.project291.navigation.*
 import com.uifinance.project291.ui.analytics.AnalyticsScreen
 import com.uifinance.project291.ui.budget.AddEntryScreen
 import com.uifinance.project291.ui.budget.BudgetListScreen
 import com.uifinance.project291.ui.dashboard.DashboardScreen
+import com.uifinance.project291.ui.onboarding.OnboardingScreen
 
 private data class BottomNavItem(
     val destination: Any,
@@ -78,48 +73,64 @@ fun NovaVestApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    val showBottomBar = currentDestination?.hasRoute(OnboardingDestination::class) == false &&
+            currentDestination.hasRoute(AddEntryDestination::class) == false
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = DeepObsidian,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            NovaVestBottomBar(
-                items = bottomNavItems,
-                currentDestination = currentDestination,
-                onItemSelected = { item ->
-                    navController.navigate(item.destination) {
-                        popUpTo(VaultDestination) {
-                            saveState = true
+            if (showBottomBar) {
+                NovaVestBottomBar(
+                    items = bottomNavItems,
+                    currentDestination = currentDestination,
+                    onItemSelected = { item ->
+                        navController.navigate(item.destination) {
+                            popUpTo(VaultDestination) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-            )
+                    },
+                )
+            }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(AddEntryDestination) },
-                containerColor = EmeraldGreen,
-                contentColor = DeepObsidian,
-                shape = CircleShape,
-                modifier = Modifier
-                    .size(56.dp)
-                    .offset(y = 40.dp) // Move it down to overlap with bottom bar
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add", modifier = Modifier.size(28.dp))
+            if (showBottomBar) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(AddEntryDestination) },
+                    containerColor = EmeraldGreen,
+                    contentColor = DeepObsidian,
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .offset(y = 40.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add", modifier = Modifier.size(28.dp))
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.Center,
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = VaultDestination,
+            startDestination = OnboardingDestination,
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .padding(innerPadding),
+                .padding(if (showBottomBar) innerPadding else PaddingValues(0.dp)),
         ) {
+            composable<OnboardingDestination> {
+                OnboardingScreen(
+                    onFinish = {
+                        navController.navigate(VaultDestination) {
+                            popUpTo(OnboardingDestination) { inclusive = true }
+                        }
+                    }
+                )
+            }
             composable<VaultDestination> {
                 DashboardScreen(onViewAllActivity = {})
             }

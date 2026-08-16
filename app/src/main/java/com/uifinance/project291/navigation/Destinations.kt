@@ -3,6 +3,9 @@ package com.uifinance.project291.navigation
 import kotlinx.serialization.Serializable
 
 @Serializable
+object OnboardingDestination
+
+@Serializable
 object VaultDestination
 
 @Serializable
