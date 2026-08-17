@@ -46,7 +46,6 @@ fun AddEntryScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Expense", "Income", "Transfer")
     
-    // Consolidated Category Sheet State
     var activeCategorySheet by remember { mutableStateOf<CategorySheetState?>(null) }
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -173,7 +172,6 @@ fun AddEntryScreen(
                         selected = selectedTab == index,
                         onClick = { 
                             selectedTab = index 
-                            // Refresh category list for income/expense
                             when (index) {
                                 0 -> categoryViewModel.setCategoryType(CategoryType.EXPENSE)
                                 1 -> categoryViewModel.setCategoryType(CategoryType.INCOME)
@@ -202,9 +200,9 @@ fun AddEntryScreen(
                             },
                             onDateClick = { showDatePicker = true },
                             onAmountClick = { isKeypadVisible = true },
-                            onPaymentMethodClick = { 
+                            onPaymentMethodClick = {
                                 isSelectingToWallet = false
-                                showPaymentMethodPicker = true 
+                                showPaymentMethodPicker = true
                             },
                             onRecurrenceClick = { showRecurrencePicker = true },
                             onAttachmentClick = { showAttachmentOptions = true }
@@ -250,7 +248,6 @@ fun AddEntryScreen(
         )
     }
 
-    // Category Sheets Logic (Same as before, not used by Transfer)
     if (activeCategorySheet != null) {
         ModalBottomSheet(
             onDismissRequest = { activeCategorySheet = null },
@@ -373,9 +370,3 @@ fun AddEntryScreen(
     }
 }
 
-@Composable
-private fun PlaceholderTab(title: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-        Text(text = "$title Entry Form", color = SecondaryText)
-    }
-}
