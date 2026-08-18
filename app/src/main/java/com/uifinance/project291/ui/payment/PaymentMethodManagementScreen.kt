@@ -19,8 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.uifinance.project291.data.local.entity.PaymentMethod
 import com.uifinance.project291.design_system.*
+import com.uifinance.project291.ui.budget.components.AddEditPaymentMethodContent
 import com.uifinance.project291.ui.components.PaymentMethodIcons
-import com.uifinance.project291.ui.payment.components.AddEditPaymentMethodBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,10 +134,10 @@ fun PaymentMethodManagementScreen(
             containerColor = DeepObsidian,
             shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
         ) {
-            AddEditPaymentMethodBottomSheet(
+            AddEditPaymentMethodContent(
                 paymentMethod = pmToEdit,
                 onDismiss = { showAddSheet = false },
-                onConfirm = { name, icon, color, type ->
+                onSave = { name, icon, color, type ->
                     if (pmToEdit == null) {
                         viewModel.addPaymentMethod(name, icon, color, type)
                     } else {

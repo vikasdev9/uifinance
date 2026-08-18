@@ -48,11 +48,9 @@ import com.uifinance.project291.design_system.EmeraldGreen
 import com.uifinance.project291.design_system.HighEmphasisText
 import com.uifinance.project291.design_system.SecondaryText
 import com.uifinance.project291.navigation.*
+import com.uifinance.project291.ui.budget.AddTransactionScreen
 import com.uifinance.project291.ui.analytics.AnalyticsScreen
-import com.uifinance.project291.ui.budget.AddEntryScreen
-import com.uifinance.project291.ui.budget.BudgetListScreen
 import com.uifinance.project291.ui.category.CategoryManagementScreen
-import com.uifinance.project291.ui.category.CategoryManagementViewModel
 import com.uifinance.project291.ui.dashboard.DashboardScreen
 import com.uifinance.project291.ui.onboarding.OnboardingScreen
 import com.uifinance.project291.ui.payment.PaymentMethodManagementScreen
@@ -145,12 +143,6 @@ fun NovaVestApp() {
             composable<AnalyticsDestination> {
                 AnalyticsScreen()
             }
-            composable<BudgetsDestination> {
-                BudgetListScreen(
-                    onAddBudget = { navController.navigate(AddEntryDestination) },
-                    onEditBudget = { id -> /* navigate to edit */ }
-                )
-            }
             composable<SettingsDestination> {
                 SettingsScreen(
                     onNavigateToCategories = { navController.navigate(ManageCategoriesDestination) },
@@ -172,7 +164,7 @@ fun NovaVestApp() {
                 )
             }
             composable<AddEntryDestination> {
-                AddEntryScreen(
+                AddTransactionScreen(
                     onBack = { navController.popBackStack() },
                     onSuccess = { navController.popBackStack() },
                     onNavigateToCategoryManagement = { navController.navigate(ManageCategoriesDestination) },
