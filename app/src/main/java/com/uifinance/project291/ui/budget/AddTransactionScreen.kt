@@ -58,7 +58,7 @@ fun AddTransactionScreen(
     var showRecurrencePicker by remember { mutableStateOf(false) }
     var showAttachmentOptions by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
-    var isKeypadVisible by remember { mutableStateOf(true) }
+    var isKeypadVisible by remember { mutableStateOf(false) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),

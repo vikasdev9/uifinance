@@ -116,7 +116,7 @@ fun DashboardContent(
             transactions = uiState.recentTransactions,
             onViewAllActivity = onViewAllActivity,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(100.dp)) // Added space for bottom navigation cutout
     }
 }
 

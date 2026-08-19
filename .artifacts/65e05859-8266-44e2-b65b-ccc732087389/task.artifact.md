@@ -1,4 +1,0 @@
-- [x] Create `OnboardingViewModel.kt`
-- [x] Update `OnboardingScreen.kt` to save completion state
-- [x] Update `NovaVestApp.kt` for dynamic start destination
-- [x] Verify build

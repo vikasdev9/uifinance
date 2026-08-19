@@ -35,7 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -49,8 +51,10 @@ import com.uifinance.project291.design_system.EmeraldGreen
 import com.uifinance.project291.design_system.HighEmphasisText
 import com.uifinance.project291.design_system.SecondaryText
 import com.uifinance.project291.navigation.*
+import com.uifinance.project291.financeUtils.CurvedBottomNavShape
 import com.uifinance.project291.ui.budget.AddTransactionScreen
 import com.uifinance.project291.ui.analytics.AnalyticsScreen
+import com.uifinance.project291.ui.budget.BudgetListScreen
 import com.uifinance.project291.ui.budget.category.CategoryManagementScreen
 import com.uifinance.project291.ui.dashboard.DashboardScreen
 import com.uifinance.project291.ui.onboarding.OnboardingScreen
@@ -124,7 +128,7 @@ fun NovaVestApp(
                     shape = CircleShape,
                     modifier = Modifier
                         .size(56.dp)
-                        .offset(y = 40.dp)
+                        .offset(y = 28.dp) // Adjusted to sit in the cutout
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add", modifier = Modifier.size(28.dp))
                 }
@@ -138,7 +142,12 @@ fun NovaVestApp(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .padding(if (showBottomBar) innerPadding else PaddingValues(0.dp)),
+                // Do NOT apply bottom padding here, so content flows behind the navigation bar
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    start = innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateRightPadding(LayoutDirection.Ltr)
+                ),
         ) {
             composable<OnboardingDestination> {
                 OnboardingScreen(
@@ -154,6 +163,9 @@ fun NovaVestApp(
             }
             composable<AnalyticsDestination> {
                 AnalyticsScreen()
+            }
+            composable<BudgetsDestination> {
+                BudgetListScreen()
             }
             composable<SettingsDestination> {
                 SettingsScreen(
@@ -193,11 +205,16 @@ private fun NovaVestBottomBar(
     currentDestination: androidx.navigation.NavDestination?,
     onItemSelected: (BottomNavItem) -> Unit,
 ) {
+    val density = LocalDensity.current
+    val curveRadius = with(density) { 54.dp.toPx() }
+    val curveDepth = with(density) { 32.dp.toPx() }
+    val curveSmoothness = with(density) { 25.dp.toPx() }
+
     NavigationBar(
         modifier = Modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
-            .background(BottomNavBackground),
+            .clip(CurvedBottomNavShape(curveRadius, curveDepth, curveSmoothness))
+            .navigationBarsPadding(),
         containerColor = BottomNavBackground,
         tonalElevation = 0.dp,
     ) {
@@ -246,27 +263,6 @@ private fun NovaVestBottomBar(
                     unselectedTextColor = SecondaryText,
                     indicatorColor = BottomNavBackground,
                 ),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PlaceholderScreen(title: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DeepObsidian),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = HighEmphasisText,
             )
         }
     }
