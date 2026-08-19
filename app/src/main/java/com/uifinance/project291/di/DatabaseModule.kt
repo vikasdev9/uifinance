@@ -5,13 +5,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.uifinance.project291.data.local.AppDatabase
-import com.uifinance.project291.data.local.CategorySeedData
-import com.uifinance.project291.data.local.dao.BudgetDao
 import com.uifinance.project291.data.local.dao.CategoryDao
 import com.uifinance.project291.data.local.dao.PaymentMethodDao
 import com.uifinance.project291.data.local.dao.TransactionDao
-import com.uifinance.project291.data.repository.CategoryRepository
-import com.uifinance.project291.data.repository.CategoryRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,14 +29,8 @@ object DatabaseModule {
         ).addCallback(object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                CategorySeedData.seed(db)
             }
         }).fallbackToDestructiveMigration().build()
-    }
-
-    @Provides
-    fun provideBudgetDao(database: AppDatabase): BudgetDao {
-        return database.budgetDao()
     }
 
     @Provides
@@ -56,11 +46,5 @@ object DatabaseModule {
     @Provides
     fun providePaymentMethodDao(database: AppDatabase): PaymentMethodDao {
         return database.paymentMethodDao()
-    }
-
-    @Provides
-    @Singleton
-    fun provideCategoryRepository(categoryDao: CategoryDao, transactionDao: TransactionDao): CategoryRepository {
-        return CategoryRepositoryImpl(categoryDao, transactionDao)
     }
 }

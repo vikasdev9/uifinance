@@ -8,6 +8,10 @@ enum class TransactionType {
     EXPENSE, INCOME, TRANSFER
 }
 
+enum class RecurrenceType {
+    NONE, DAILY, WEEKLY, WEEKEND, MONTHLY
+}
+
 @Entity(tableName = "transactions")
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
