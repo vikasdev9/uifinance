@@ -12,7 +12,7 @@ object VaultDestination
 object AnalyticsDestination
 
 @Serializable
-object SettingsDestination
+object MineDestination
 
 @Serializable
 object ManageCategoriesDestination

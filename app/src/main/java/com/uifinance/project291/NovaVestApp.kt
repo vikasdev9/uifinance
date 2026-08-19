@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.PieChart
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -59,7 +60,7 @@ import com.uifinance.project291.ui.budget.category.CategoryManagementScreen
 import com.uifinance.project291.ui.dashboard.DashboardScreen
 import com.uifinance.project291.ui.onboarding.OnboardingScreen
 import com.uifinance.project291.ui.budget.payment.PaymentMethodManagementScreen
-import com.uifinance.project291.ui.settings.SettingsScreen
+import com.uifinance.project291.ui.settings.MineScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 
 private data class BottomNavItem(
@@ -72,7 +73,7 @@ private val bottomNavItems = listOf(
     BottomNavItem(VaultDestination, "Vault", Icons.Outlined.AccountBalanceWallet),
     BottomNavItem(AnalyticsDestination, "Analytics", Icons.Outlined.BarChart),
     BottomNavItem(BudgetsDestination, "Budgets", Icons.Outlined.PieChart),
-    BottomNavItem(SettingsDestination, "Settings", Icons.Outlined.Settings),
+    BottomNavItem(MineDestination, "Mine", Icons.Outlined.Person),
 )
 
 @Composable
@@ -167,8 +168,8 @@ fun NovaVestApp(
             composable<BudgetsDestination> {
                 BudgetListScreen()
             }
-            composable<SettingsDestination> {
-                SettingsScreen(
+            composable<MineDestination> {
+                MineScreen(
                     onNavigateToCategories = { navController.navigate(ManageCategoriesDestination) },
                     onNavigateToPaymentMethods = { navController.navigate(ManagePaymentMethodsDestination) },
                     onNavigateToAccounts = {},
