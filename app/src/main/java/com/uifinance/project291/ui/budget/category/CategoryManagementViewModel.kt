@@ -1,4 +1,4 @@
-package com.uifinance.project291.ui.category
+package com.uifinance.project291.ui.budget.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

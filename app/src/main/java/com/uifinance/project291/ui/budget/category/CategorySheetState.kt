@@ -1,4 +1,4 @@
-package com.uifinance.project291.ui.category
+package com.uifinance.project291.ui.budget.category
 
 sealed class CategorySheetState {
     object Picker : CategorySheetState()

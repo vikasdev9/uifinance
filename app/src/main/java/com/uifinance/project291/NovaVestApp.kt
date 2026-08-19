@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -50,11 +51,10 @@ import com.uifinance.project291.design_system.SecondaryText
 import com.uifinance.project291.navigation.*
 import com.uifinance.project291.ui.budget.AddTransactionScreen
 import com.uifinance.project291.ui.analytics.AnalyticsScreen
-import com.uifinance.project291.ui.category.CategoryManagementScreen
+import com.uifinance.project291.ui.budget.category.CategoryManagementScreen
 import com.uifinance.project291.ui.dashboard.DashboardScreen
 import com.uifinance.project291.ui.onboarding.OnboardingScreen
-import com.uifinance.project291.ui.payment.PaymentMethodManagementScreen
-import com.uifinance.project291.ui.payment.PaymentMethodManagementViewModel
+import com.uifinance.project291.ui.budget.payment.PaymentMethodManagementScreen
 import com.uifinance.project291.ui.settings.SettingsScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -72,10 +72,22 @@ private val bottomNavItems = listOf(
 )
 
 @Composable
-fun NovaVestApp() {
+fun NovaVestApp(
+    viewModel: MainViewModel = hiltViewModel()
+) {
+    val onboardingCompleted by viewModel.onboardingCompleted.collectAsStateWithLifecycle()
+
+    if (onboardingCompleted == null) {
+        // Initial loading state - show a blank screen with theme background to avoid flicker
+        Box(modifier = Modifier.fillMaxSize().background(DeepObsidian))
+        return
+    }
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    val startDestination = if (onboardingCompleted == true) VaultDestination else OnboardingDestination
 
     val showBottomBar = currentDestination?.hasRoute(OnboardingDestination::class) == false &&
             currentDestination.hasRoute(AddEntryDestination::class) == false &&
@@ -122,7 +134,7 @@ fun NovaVestApp() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = OnboardingDestination,
+            startDestination = startDestination,
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()

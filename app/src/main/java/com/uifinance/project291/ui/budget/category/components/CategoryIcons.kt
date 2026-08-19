@@ -1,4 +1,4 @@
-package com.uifinance.project291.ui.category.components
+package com.uifinance.project291.ui.budget.category.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.*

@@ -1,4 +1,4 @@
-package com.uifinance.project291.ui.category.components
+package com.uifinance.project291.ui.budget.category.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,10 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.uifinance.project291.data.local.entity.Category
 import com.uifinance.project291.design_system.*

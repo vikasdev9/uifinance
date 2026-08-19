@@ -1,7 +1,6 @@
-package com.uifinance.project291.ui.payment
+package com.uifinance.project291.ui.budget.payment
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items

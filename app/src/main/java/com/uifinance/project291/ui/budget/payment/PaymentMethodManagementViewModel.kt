@@ -1,4 +1,4 @@
-package com.uifinance.project291.ui.payment
+package com.uifinance.project291.ui.budget.payment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

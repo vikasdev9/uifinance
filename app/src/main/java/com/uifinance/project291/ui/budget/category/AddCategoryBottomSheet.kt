@@ -1,4 +1,4 @@
-package com.uifinance.project291.ui.category
+package com.uifinance.project291.ui.budget.category
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.uifinance.project291.design_system.*
-import com.uifinance.project291.ui.category.components.CategoryIcons
+import com.uifinance.project291.ui.budget.category.components.CategoryIcons
 import com.uifinance.project291.ui.components.GenericBottomSheetContent
 
 @Composable

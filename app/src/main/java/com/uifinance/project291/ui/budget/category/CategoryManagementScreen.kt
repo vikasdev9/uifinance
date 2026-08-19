@@ -1,6 +1,5 @@
-package com.uifinance.project291.ui.category
+package com.uifinance.project291.ui.budget.category
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,14 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.uifinance.project291.data.local.entity.Category
 import com.uifinance.project291.data.local.entity.CategoryType
-import com.uifinance.project291.data.local.entity.CategoryWithChildren
 import com.uifinance.project291.design_system.*
-import com.uifinance.project291.ui.category.components.AddEditCategoryBottomSheet
-import com.uifinance.project291.ui.category.components.CategoryIcons
+import com.uifinance.project291.ui.budget.category.components.AddEditCategoryBottomSheet
+import com.uifinance.project291.ui.budget.category.components.CategoryIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -302,7 +300,7 @@ fun EmptyState() {
             "Create categories to organize your expenses and income.",
             color = SecondaryText,
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )
     }

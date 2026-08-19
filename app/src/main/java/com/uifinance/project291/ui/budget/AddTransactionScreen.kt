@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,9 +28,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.uifinance.project291.data.local.entity.CategoryType as DataCategoryType
 import com.uifinance.project291.design_system.*
 import com.uifinance.project291.data.model.domain.RecurrenceType
+import com.uifinance.project291.ui.budget.category.AddCategoryContent
+import com.uifinance.project291.ui.budget.category.CategoryPickerContent
+import com.uifinance.project291.ui.budget.category.CategoryPickerViewModel
+import com.uifinance.project291.ui.budget.category.CategorySheetState
 import com.uifinance.project291.ui.budget.components.*
-import com.uifinance.project291.ui.category.*
-import com.uifinance.project291.ui.category.components.CategoryIcons
+import com.uifinance.project291.ui.budget.category.components.CategoryIcons
 import com.uifinance.project291.ui.components.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -260,7 +262,7 @@ fun AddTransactionScreen(
                             categoryViewModel.addCategory(name, icon, color, state.parentId)
                             activeCategorySheet = CategorySheetState.Picker
                         },
-                        onDismiss = { 
+                        onDismiss = {
                             activeCategorySheet = CategorySheetState.Picker
                         }
                     )

@@ -24,12 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.uifinance.project291.design_system.*
 import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingScreen(
-    onFinish: () -> Unit
+    onFinish: () -> Unit,
+    viewModel: OnboardingViewModel = hiltViewModel()
 ) {
     val pagerState = rememberPagerState(pageCount = { 3 })
     val scope = rememberCoroutineScope()
@@ -77,6 +79,7 @@ fun OnboardingScreen(
                         if (pagerState.currentPage < 2) {
                             scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
                         } else {
+                            viewModel.completeOnboarding()
                             onFinish()
                         }
                     },
