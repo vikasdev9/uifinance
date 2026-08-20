@@ -77,12 +77,6 @@ class CategoryPickerViewModel @Inject constructor(
         }
     }
 
-    fun selectCategory(category: Category) {
-        viewModelScope.launch {
-            _categorySelectedEvent.emit(category)
-        }
-    }
-
     fun addCategory(name: String, iconRes: String, colorHex: String, parentId: Long? = null) {
         viewModelScope.launch {
             val category = Category(

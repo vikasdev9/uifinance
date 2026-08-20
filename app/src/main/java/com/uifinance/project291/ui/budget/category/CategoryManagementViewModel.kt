@@ -163,9 +163,4 @@ class CategoryManagementViewModel @Inject constructor(
         }
     }
 
-    fun reorderCategories(categories: List<Category>) {
-        viewModelScope.launch {
-            repository.updateSortOrders(categories)
-        }
-    }
 }
