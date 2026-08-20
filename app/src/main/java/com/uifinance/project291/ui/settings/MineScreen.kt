@@ -67,7 +67,7 @@ fun MineScreen(
                         onClick = { /* TODO */ }
                     )
                     MineItem(
-                        icon = Icons.Rounded.ColorLens,
+                        icon = Icons.Rounded.Brush,
                         title = "Accent Color",
                         subtitle = accentColor,
                         onClick = { /* TODO */ }

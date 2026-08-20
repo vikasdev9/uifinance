@@ -219,14 +219,12 @@ fun AddTransactionScreen(
         )
     }
 
-    if (activeCategorySheet != null) {
-        ModalBottomSheet(
-            onDismissRequest = { activeCategorySheet = null },
-            containerColor = DeepObsidian,
-            dragHandle = null,
-            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
-        ) {
-            when (val state = activeCategorySheet) {
+    AppModalBottomSheet(
+        visible = activeCategorySheet != null,
+        onDismissRequest = { activeCategorySheet = null },
+        skipPartiallyExpanded = false
+    ) {
+        when (val state = activeCategorySheet) {
                 is CategorySheetState.Picker -> {
                     CategoryPickerContent(
                         viewModel = categoryViewModel,
@@ -270,7 +268,6 @@ fun AddTransactionScreen(
                 else -> {}
             }
         }
-    }
 
     if (showPaymentMethodPicker) {
         val selectedPaymentMethod = if (uiState.selectedTab == 2) {
@@ -293,11 +290,9 @@ fun AddTransactionScreen(
             dataPaymentMethods.find { it.id == domain.id }
         }
 
-        ModalBottomSheet(
-            onDismissRequest = { showPaymentMethodPicker = false },
-            containerColor = DeepObsidian,
-            dragHandle = null,
-            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+        AppModalBottomSheet(
+            visible = showPaymentMethodPicker,
+            onDismissRequest = { showPaymentMethodPicker = false }
         ) {
             PaymentMethodPickerContent(
                 paymentMethods = dataPaymentMethods,

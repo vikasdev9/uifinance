@@ -2,7 +2,6 @@ package com.uifinance.project291.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.*
@@ -24,24 +23,22 @@ fun GenericBottomSheet(
     headerAction: @Composable (RowScope.() -> Unit)? = null,
     containerColor: Color = DeepObsidian,
     headerColor: Color = AnalyticsBackground,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    ModalBottomSheet(
+    AppModalBottomSheet(
+        visible = true,
         onDismissRequest = onDismiss,
+        title = title,
+        showCloseButton = true,
+        headerAction = headerAction,
         containerColor = containerColor,
-        dragHandle = null,
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-    ) {
-        GenericBottomSheetContent(
-            title = title,
-            onDismiss = onDismiss,
-            headerAction = headerAction,
-            headerColor = headerColor,
-            content = content
-        )
-    }
+        headerColor = headerColor,
+        content = content
+    )
 }
 
+// GenericBottomSheetContent is kept for cases where a custom wrapper is needed, 
+// but most users should migrate to AppModalBottomSheet or GenericBottomSheet.
 @Composable
 fun GenericBottomSheetContent(
     title: String,
@@ -78,7 +75,7 @@ fun GenericBottomSheetContent(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
+                .navigationBarsPadding()
         ) {
             content()
         }

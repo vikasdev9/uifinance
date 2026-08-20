@@ -43,7 +43,8 @@ fun CategoryPickerContent(
 
     Column(
         modifier = Modifier
-            .fillMaxHeight(0.9f)
+            .fillMaxWidth()
+            .heightIn(min = 400.dp, max = 800.dp) // Set a reasonable range instead of fixed 90%
             .padding(bottom = 24.dp)
     ) {
         // Header

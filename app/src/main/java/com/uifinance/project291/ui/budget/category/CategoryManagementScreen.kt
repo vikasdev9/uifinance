@@ -23,6 +23,7 @@ import com.uifinance.project291.data.local.entity.CategoryType
 import com.uifinance.project291.design_system.*
 import com.uifinance.project291.ui.budget.category.components.AddEditCategoryBottomSheet
 import com.uifinance.project291.ui.budget.category.components.CategoryIcons
+import com.uifinance.project291.ui.components.AppModalBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -233,28 +234,25 @@ fun CategoryManagementScreen(
         }
     }
 
-    if (showAddSheet) {
-        val parentCategories = (uiState as? CategoryManagementUiState.Success)?.categories?.map { it.category } ?: emptyList()
-        ModalBottomSheet(
-            onDismissRequest = { showAddSheet = false },
-            containerColor = DeepObsidian,
-            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
-        ) {
-            AddEditCategoryBottomSheet(
-                category = categoryToEdit,
-                parentId = selectedParentIdForAdd,
-                parentCategories = parentCategories,
-                onDismiss = { showAddSheet = false },
-                onConfirm = { name, icon, color, parentId ->
-                    if (categoryToEdit == null) {
-                        viewModel.addCategory(name, icon, color, parentId)
-                    } else {
-                        viewModel.updateCategory(categoryToEdit!!.copy(name = name, iconRes = icon, colorHex = color, parentId = parentId))
-                    }
-                    showAddSheet = false
+    val parentCategories = (uiState as? CategoryManagementUiState.Success)?.categories?.map { it.category } ?: emptyList()
+    AppModalBottomSheet(
+        visible = showAddSheet,
+        onDismissRequest = { showAddSheet = false }
+    ) {
+        AddEditCategoryBottomSheet(
+            category = categoryToEdit,
+            parentId = selectedParentIdForAdd,
+            parentCategories = parentCategories,
+            onDismiss = { showAddSheet = false },
+            onConfirm = { name, icon, color, parentId ->
+                if (categoryToEdit == null) {
+                    viewModel.addCategory(name, icon, color, parentId)
+                } else {
+                    viewModel.updateCategory(categoryToEdit!!.copy(name = name, iconRes = icon, colorHex = color, parentId = parentId))
                 }
-            )
-        }
+                showAddSheet = false
+            }
+        )
     }
 }
 

@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import com.uifinance.project291.design_system.*
 import com.uifinance.project291.data.model.domain.RecurrenceType
 
+import com.uifinance.project291.ui.components.AppModalBottomSheet
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecurrenceBottomSheet(
@@ -32,21 +34,12 @@ fun RecurrenceBottomSheet(
         RecurrenceType.MONTHLY to "Monthly"
     )
 
-    ModalBottomSheet(
+    AppModalBottomSheet(
+        visible = true,
         onDismissRequest = onDismiss,
-        containerColor = DeepObsidian,
-        dragHandle = null,
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+        title = "Period"
     ) {
         Column(modifier = Modifier.padding(bottom = 24.dp)) {
-            Text(
-                text = "Period",
-                style = MaterialTheme.typography.titleLarge,
-                color = HighEmphasisText,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(24.dp)
-            )
-
             options.forEach { (type, label) ->
                 Row(
                     modifier = Modifier

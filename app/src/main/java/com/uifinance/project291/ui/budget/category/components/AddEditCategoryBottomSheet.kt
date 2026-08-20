@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.uifinance.project291.data.local.entity.Category
 import com.uifinance.project291.design_system.*
+import com.uifinance.project291.ui.components.AppModalBottomSheet
 import com.uifinance.project291.ui.components.GenericBottomSheetContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -225,45 +226,39 @@ fun AddEditCategoryBottomSheet(
             ) {
                 Text("SAVE CATEGORY", color = DeepObsidian, fontWeight = FontWeight.Bold)
             }
-            
-            Spacer(modifier = Modifier.height(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()))
         }
     }
 
-    if (showParentSelection) {
-        ModalBottomSheet(
-            onDismissRequest = { showParentSelection = false },
-            containerColor = DeepObsidian
+    AppModalBottomSheet(
+        visible = showParentSelection,
+        onDismissRequest = { showParentSelection = false },
+        title = "Select Parent Category"
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
-            ) {
-                item {
-                    Text("Select Parent Category", style = MaterialTheme.typography.titleLarge, color = HighEmphasisText, modifier = Modifier.padding(bottom = 16.dp))
-                }
-                items(parentCategories) { parent ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { 
-                                selectedParentId = parent.id
-                                showParentSelection = false
-                            }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = CategoryIcons.getIcon(parent.iconRes),
-                            contentDescription = null,
-                            tint = Color(android.graphics.Color.parseColor(parent.colorHex)),
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(parent.name, color = HighEmphasisText)
-                        if (selectedParentId == parent.id) {
-                            Spacer(modifier = Modifier.weight(1f))
-                            Icon(Icons.Rounded.Check, contentDescription = null, tint = EmeraldGreen)
+            items(parentCategories) { parent ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { 
+                            selectedParentId = parent.id
+                            showParentSelection = false
                         }
+                        .padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = CategoryIcons.getIcon(parent.iconRes),
+                        contentDescription = null,
+                        tint = Color(android.graphics.Color.parseColor(parent.colorHex)),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(parent.name, color = HighEmphasisText)
+                    if (selectedParentId == parent.id) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Icon(Icons.Rounded.Check, contentDescription = null, tint = EmeraldGreen)
                     }
                 }
             }

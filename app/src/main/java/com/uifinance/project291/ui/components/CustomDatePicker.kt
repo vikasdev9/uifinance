@@ -36,11 +36,9 @@ fun CustomDatePickerBottomSheet(
     var currentMonth by remember { mutableStateOf(Calendar.getInstance().apply { time = initialDate }) }
     var selectedDate by remember { mutableStateOf(Calendar.getInstance().apply { time = initialDate }) }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = DeepObsidian,
-        dragHandle = null,
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+    AppModalBottomSheet(
+        visible = true,
+        onDismissRequest = onDismiss
     ) {
         Column(
             modifier = Modifier

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.uifinance.project291.data.local.entity.PaymentMethod
 import com.uifinance.project291.design_system.*
 import com.uifinance.project291.ui.budget.components.AddEditPaymentMethodContent
+import com.uifinance.project291.ui.components.AppModalBottomSheet
 import com.uifinance.project291.ui.components.PaymentMethodIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,25 +128,22 @@ fun PaymentMethodManagementScreen(
         }
     }
 
-    if (showAddSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showAddSheet = false },
-            containerColor = DeepObsidian,
-            shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
-        ) {
-            AddEditPaymentMethodContent(
-                paymentMethod = pmToEdit,
-                onDismiss = { showAddSheet = false },
-                onSave = { name, icon, color, type ->
-                    if (pmToEdit == null) {
-                        viewModel.addPaymentMethod(name, icon, color, type)
-                    } else {
-                        viewModel.updatePaymentMethod(pmToEdit!!.copy(name = name, iconRes = icon, colorHex = color, type = type))
-                    }
-                    showAddSheet = false
+    AppModalBottomSheet(
+        visible = showAddSheet,
+        onDismissRequest = { showAddSheet = false }
+    ) {
+        AddEditPaymentMethodContent(
+            paymentMethod = pmToEdit,
+            onDismiss = { showAddSheet = false },
+            onSave = { name, icon, color, type ->
+                if (pmToEdit == null) {
+                    viewModel.addPaymentMethod(name, icon, color, type)
+                } else {
+                    viewModel.updatePaymentMethod(pmToEdit!!.copy(name = name, iconRes = icon, colorHex = color, type = type))
                 }
-            )
-        }
+                showAddSheet = false
+            }
+        )
     }
 }
 
